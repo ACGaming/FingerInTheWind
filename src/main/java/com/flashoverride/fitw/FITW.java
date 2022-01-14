@@ -15,9 +15,7 @@ public class FITW
 {
     public static final String MOD_ID = "fitw";
     public static final String VERSION = "1.0.0";
-    public static final String NAME = "Finger in the Wind";
-
-    public static int wet_cooldown = 0;
+    public static final String NAME = "Finger In The Wind";
 
     @Mod.EventHandler
     public static void preInit(FMLPreInitializationEvent event)

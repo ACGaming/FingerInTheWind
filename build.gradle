@@ -70,7 +70,7 @@ dependencies {
 jar {
     manifest {
         attributes([
-                "Specification-Title"     : "fingerinthewind",
+                "Specification-Title"     : "FingerInTheWind",
                 "Specification-Vendor"    : "ACGaming, Konlii",
                 "Specification-Version"   : "1",
                 "Implementation-Title"    : project.name,

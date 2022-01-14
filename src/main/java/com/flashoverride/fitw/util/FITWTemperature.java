@@ -6,7 +6,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-import com.flashoverride.fitw.FITW;
 import net.dries007.tfc.objects.fluids.FluidsTFC;
 import net.dries007.tfc.util.climate.ClimateTFC;
 
@@ -20,11 +19,15 @@ public class FITWTemperature
         BlockPos pos = new BlockPos(posX, posY, posZ);
 
         float temp = ClimateTFC.getActualTemp(world, pos);
-        String fuzzyTemp;
         float rain = ClimateTFC.getRainfall(world, pos);
+
+        int wet_cooldown = 0;
+
+        String fuzzy_temp;
         String humidity = "";
         String conjunction = " and ";
-        boolean isSpring = false;
+
+        boolean hot_spring = false;
 
         if (rain < 50) humidity = "very dry";
         else if (rain < 100) humidity = "dry";
@@ -42,26 +45,26 @@ public class FITWTemperature
             else humidity = "rainy";
         }
 
-        if (temp < -30) fuzzyTemp = "deathly cold";
-        else if (temp < -20) fuzzyTemp = "bone-chillingly cold";
-        else if (temp < -10) fuzzyTemp = "extremely cold";
-        else if (temp < 0) fuzzyTemp = "freezing";
-        else if (temp < 5) fuzzyTemp = "very cold";
-        else if (temp < 10) fuzzyTemp = "cold";
-        else if (temp < 15) fuzzyTemp = "cool";
-        else if (temp < 20) fuzzyTemp = "nice";
-        else if (temp < 25) fuzzyTemp = "warm";
-        else if (temp < 30) fuzzyTemp = "hot";
-        else if (temp < 35) fuzzyTemp = "very hot";
-        else fuzzyTemp = "burning hot";
+        if (temp < -30) fuzzy_temp = "deathly cold";
+        else if (temp < -20) fuzzy_temp = "bone-chillingly cold";
+        else if (temp < -10) fuzzy_temp = "extremely cold";
+        else if (temp < 0) fuzzy_temp = "freezing";
+        else if (temp < 5) fuzzy_temp = "very cold";
+        else if (temp < 10) fuzzy_temp = "cold";
+        else if (temp < 15) fuzzy_temp = "cool";
+        else if (temp < 20) fuzzy_temp = "nice";
+        else if (temp < 25) fuzzy_temp = "warm";
+        else if (temp < 30) fuzzy_temp = "hot";
+        else if (temp < 35) fuzzy_temp = "very hot";
+        else fuzzy_temp = "burning hot";
 
         if (player.isInWater())
         {
-            FITW.wet_cooldown = 40;
+            wet_cooldown = 40;
         }
 
         if (player.isBurning()) return "The air is filled with smoke and the stench of burning flesh";
-        else if (FITW.wet_cooldown > 0)
+        else if (wet_cooldown > 0)
         {
             int blockY = MathHelper.floor(player.getEntityBoundingBox().maxY);
             Block block;
@@ -72,15 +75,15 @@ public class FITWTemperature
 
                 if (block.equals(FluidsTFC.HOT_WATER.get().getBlock()))
                 {
-                    isSpring = true;
+                    hot_spring = true;
                 }
                 --blockY;
             }
 
-            FITW.wet_cooldown -= 1;
-            if (isSpring) return "The water feels rejuvenating";
-            else return "The water feels " + fuzzyTemp;
+            wet_cooldown -= 1;
+            if (hot_spring) return "The water feels rejuvenating";
+            else return "The water feels " + fuzzy_temp;
         }
-        else return "The air feels " + fuzzyTemp + conjunction + humidity;
+        else return "The air feels " + fuzzy_temp + conjunction + humidity;
     }
 }
