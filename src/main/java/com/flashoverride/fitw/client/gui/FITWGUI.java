@@ -3,6 +3,7 @@ package com.flashoverride.fitw.client.gui;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
@@ -26,6 +27,9 @@ public class FITWGUI extends Gui
     {
         if (event.isCancelable() || event.getType() != ElementType.HOTBAR || mc.gameSettings.showDebugInfo) return;
         FontRenderer fontRenderer = this.mc.fontRenderer;
-        fontRenderer.drawStringWithShadow(FITWTemperature.getTemp(mc.world, mc.player), FITWConfig.xPos_actual, FITWConfig.yPos_actual, FITWConfig.color_actual);
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(FITWConfig.scale, FITWConfig.scale, FITWConfig.scale);
+        fontRenderer.drawStringWithShadow(FITWTemperature.getTemp(mc.world, mc.player), FITWConfig.xPos, FITWConfig.yPos, FITWConfig.color);
+        GlStateManager.popMatrix();
     }
 }

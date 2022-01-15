@@ -1,45 +1,62 @@
 package com.flashoverride.fitw.config;
 
-import java.io.File;
+import net.minecraftforge.common.config.Config;
+import net.minecraftforge.common.config.ConfigManager;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
+import com.flashoverride.fitw.FITW;
 
+@Config(modid = FITW.MOD_ID, name = "FITW")
 public class FITWConfig
 {
-    public static int xPos_actual;
-    public static int xPos_default = 2;
-    public static int yPos_actual;
-    public static int yPos_default = 2;
+    @Config.Name("Horizontal position")
+    @Config.Comment("X position in pixels from the left side of the screen")
+    public static int xPos = 2;
 
-    public static int color_actual;
-    public static String color_default = "FFFFFF";
+    @Config.Name("Vertical position")
+    @Config.Comment("Y position in pixels from the top of the screen")
+    public static int yPos = 2;
 
-    public static void init(File configFile)
+    @Config.Name("Scale")
+    @Config.Comment("The scale of the message")
+    public static float scale = 1.0F;
+
+    @Config.Name("Color")
+    @Config.Comment("The integer color of the message")
+    public static int color = 0xFFFFFF;
+
+    @Config.Name("Temperature")
+    @Config.Comment("Include temperature in the message")
+    public static boolean msgTemperature = true;
+
+    @Config.Name("Humidity")
+    @Config.Comment("Include humidity in the message")
+    public static boolean msgHumidity = true;
+
+    @Config.Name("Weather")
+    @Config.Comment("Include weather in the message")
+    public static boolean msgWeather = true;
+
+    @Config.Name("Player burning")
+    @Config.Comment("Display a special message when the player is burning")
+    public static boolean msgBurning = true;
+
+    @Config.Name("Player in water")
+    @Config.Comment("Display a special message when the player is in water")
+    public static boolean msgWater = true;
+
+    @Mod.EventBusSubscriber(modid = FITW.MOD_ID)
+    public static class EventHandler
     {
-        Configuration config = new Configuration(configFile);
-
-        config.load();
-
-        Property xPos = config.get(Configuration.CATEGORY_GENERAL, "xPosition", xPos_default);
-        xPos.setComment("X position in pixels from left side of the screen");
-        xPos_actual = xPos.getInt();
-
-        Property yPos = config.get(Configuration.CATEGORY_GENERAL, "yPosition", yPos_default);
-        yPos.setComment("Y position in pixels from top of the screen");
-        yPos_actual = yPos.getInt();
-
-        Property color = config.get(Configuration.CATEGORY_GENERAL, "Color", color_default);
-        color.setComment("The color of the clock text in 6 digit HEX");
-        try
+        @SubscribeEvent
+        public static void onConfigChanged(final ConfigChangedEvent.OnConfigChangedEvent event)
         {
-            color_actual = Integer.parseInt(color.getString(), 16);
+            if (event.getModID().equals(FITW.MOD_ID))
+            {
+                ConfigManager.sync(FITW.MOD_ID, Config.Type.INSTANCE);
+            }
         }
-        catch (NumberFormatException nfe)
-        {
-            color_actual = 0xFFFFFF;
-        }
-
-        config.save();
     }
 }

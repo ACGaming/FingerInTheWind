@@ -4,10 +4,13 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
+import com.flashoverride.fitw.config.FITWConfig;
 import net.dries007.tfc.objects.fluids.FluidsTFC;
 import net.dries007.tfc.util.climate.ClimateTFC;
+import net.dries007.tfc.world.classic.biomes.BiomesTFC;
 
 public class FITWTemperature
 {
@@ -18,72 +21,74 @@ public class FITWTemperature
         int posZ = MathHelper.floor(player.posZ);
         BlockPos pos = new BlockPos(posX, posY, posZ);
 
-        float temp = ClimateTFC.getActualTemp(world, pos);
-        float rain = ClimateTFC.getRainfall(world, pos);
+        float temperature = ClimateTFC.getActualTemp(world, pos);
+        float rainfall = ClimateTFC.getRainfall(world, pos);
 
-        int wet_cooldown = 0;
+        int wetCooldown = 0;
 
-        String fuzzy_temp;
-        String humidity = "";
-        String conjunction = " and ";
+        String temperatureFuzzy;
+        String humidity;
+        String conjunction = " " + new TextComponentTranslation("msg.fitw.conjunction.and").getFormattedText() + " ";
 
-        boolean hot_spring = false;
+        boolean hotSpring = false;
 
-        if (rain < 50) humidity = "very dry";
-        else if (rain < 100) humidity = "dry";
-        else if (rain < 150) conjunction = "";
-        else if (rain < 200) humidity = "damp";
-        else if (rain < 300) humidity = "humid";
-        else if (rain < 450) humidity = "very humid";
-        else humidity = "wet";
+        if (rainfall < 50) humidity = new TextComponentTranslation("msg.fitw.humidity.very_dry").getFormattedText();
+        else if (rainfall < 100) humidity = new TextComponentTranslation("msg.fitw.humidity.dry").getFormattedText();
+        else if (rainfall < 150) humidity = new TextComponentTranslation("msg.fitw.humidity.bland").getFormattedText();
+        else if (rainfall < 200) humidity = new TextComponentTranslation("msg.fitw.humidity.damp").getFormattedText();
+        else if (rainfall < 300) humidity = new TextComponentTranslation("msg.fitw.humidity.humid").getFormattedText();
+        else if (rainfall < 450) humidity = new TextComponentTranslation("msg.fitw.humidity.very_humid").getFormattedText();
+        else humidity = new TextComponentTranslation("msg.fitw.humidity.wet").getFormattedText();
 
-        if (world.isRaining())
+        if (world.getBiome(pos).equals(BiomesTFC.SWAMPLAND)) humidity = new TextComponentTranslation("msg.fitw.humidity.swampy").getFormattedText();
+
+        if (FITWConfig.msgWeather && world.isRaining())
         {
-            conjunction = " and ";
-            if (world.isThundering()) humidity = "stormy";
-            else if (world.canSnowAt(pos, false)) humidity = "snowy";
-            else humidity = "rainy";
+            conjunction = " " + new TextComponentTranslation("msg.fitw.conjunction.and").getFormattedText() + " ";
+            if (world.isThundering()) humidity = new TextComponentTranslation("msg.fitw.weather.stormy").getFormattedText();
+            else if (world.getBiome(pos).getEnableSnow()) humidity = new TextComponentTranslation("msg.fitw.weather.snowy").getFormattedText();
+            else humidity = new TextComponentTranslation("msg.fitw.weather.rainy").getFormattedText();
         }
 
-        if (temp < -30) fuzzy_temp = "deathly cold";
-        else if (temp < -20) fuzzy_temp = "bone-chillingly cold";
-        else if (temp < -10) fuzzy_temp = "extremely cold";
-        else if (temp < 0) fuzzy_temp = "freezing";
-        else if (temp < 5) fuzzy_temp = "very cold";
-        else if (temp < 10) fuzzy_temp = "cold";
-        else if (temp < 15) fuzzy_temp = "cool";
-        else if (temp < 20) fuzzy_temp = "nice";
-        else if (temp < 25) fuzzy_temp = "warm";
-        else if (temp < 30) fuzzy_temp = "hot";
-        else if (temp < 35) fuzzy_temp = "very hot";
-        else fuzzy_temp = "burning hot";
+        if (temperature < -30) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.deathly_cold").getFormattedText();
+        else if (temperature < -20) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.bone_chillingly_cold").getFormattedText();
+        else if (temperature < -10) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.extremely_cold").getFormattedText();
+        else if (temperature < 0) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.freezing").getFormattedText();
+        else if (temperature < 5) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.very_cold").getFormattedText();
+        else if (temperature < 10) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.cold").getFormattedText();
+        else if (temperature < 15) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.cool").getFormattedText();
+        else if (temperature < 20) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.nice").getFormattedText();
+        else if (temperature < 25) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.warm").getFormattedText();
+        else if (temperature < 30) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.hot").getFormattedText();
+        else if (temperature < 35) temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.very_hot").getFormattedText();
+        else temperatureFuzzy = new TextComponentTranslation("msg.fitw.temperature.burning_hot").getFormattedText();
 
-        if (player.isInWater())
+        if (FITWConfig.msgWater && player.isInWater())
         {
-            wet_cooldown = 40;
+            wetCooldown = 40;
         }
 
-        if (player.isBurning()) return "The air is filled with smoke and the stench of burning flesh";
-        else if (wet_cooldown > 0)
+        if (FITWConfig.msgBurning && player.isBurning()) return new TextComponentTranslation("msg.fitw.burning").getFormattedText();
+        else if (FITWConfig.msgWater && wetCooldown > 0)
         {
             int blockY = MathHelper.floor(player.getEntityBoundingBox().maxY);
             Block block;
-
             while (blockY >= MathHelper.floor(player.getEntityBoundingBox().minY) - 1)
             {
                 block = world.getBlockState(pos).getBlock();
-
                 if (block.equals(FluidsTFC.HOT_WATER.get().getBlock()))
                 {
-                    hot_spring = true;
+                    hotSpring = true;
                 }
                 --blockY;
             }
-
-            wet_cooldown -= 1;
-            if (hot_spring) return "The water feels rejuvenating";
-            else return "The water feels " + fuzzy_temp;
+            wetCooldown -= 1;
+            if (hotSpring) return new TextComponentTranslation("msg.fitw.hot_spring").getFormattedText();
+            else return new TextComponentTranslation("msg.fitw.water").getFormattedText() + " " + temperatureFuzzy;
         }
-        else return "The air feels " + fuzzy_temp + conjunction + humidity;
+        else if (FITWConfig.msgTemperature && FITWConfig.msgHumidity) return new TextComponentTranslation("msg.fitw.air").getFormattedText() + " " + temperatureFuzzy + conjunction + humidity;
+        else if (FITWConfig.msgTemperature && !temperatureFuzzy.equals("")) return new TextComponentTranslation("msg.fitw.air").getFormattedText() + " " + temperatureFuzzy;
+        else if (FITWConfig.msgHumidity && !humidity.equals("")) return new TextComponentTranslation("msg.fitw.air").getFormattedText() + " " + humidity;
+        else return null;
     }
 }
