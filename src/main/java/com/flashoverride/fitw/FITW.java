@@ -9,11 +9,11 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 import com.flashoverride.fitw.client.gui.FITWGUI;
 
-@Mod(modid = FITW.MOD_ID, name = FITW.NAME, version = FITW.VERSION, acceptedMinecraftVersions = "[1.12.2]", dependencies = "required-after:tfc")
+@Mod(modid = FITW.MOD_ID, name = FITW.NAME, version = FITW.VERSION, acceptedMinecraftVersions = "[1.12.2]", dependencies = "required-after:tfc", clientSideOnly = true)
 public class FITW
 {
     public static final String MOD_ID = "fitw";
-    public static final String VERSION = "1.1.0";
+    public static final String VERSION = "1.1.1";
     public static final String NAME = "Finger In The Wind";
 
     @Mod.EventHandler
